@@ -1,5 +1,9 @@
 //#include<stdio.h>
 
+extern "C" {
+    void constructTable();        // Initializes the scan code to ASCII lookup table
+    void scans(char* buffer);     // Reads input into the buffer using scan codes
+}
 
 int calcSquare(int x){
     return x*x;
@@ -53,41 +57,22 @@ void loadStr(char* string, char* num){
 }
 void print(char* string){
     char* vmem = (char*)0xb8000;
-    int i=0;
-    while (string[i] != '\0'){
-        vmem[i*2] = string[i];// when trying this on the linux system it will segfault as programs aren't allowed to access vmem directly
+    static int i=0;
+    int itter=0;
+    while (string[itter] != '\0'){
+        vmem[i*2] = string[itter];// when trying this on the linux system it will segfault as programs aren't allowed to access vmem directly
         vmem[i*2+1] = 0x07;
         i++;
+        itter++;
     }
 }
+
 extern "C" int main(){
-    char* vmem = (char*)0xb8000;
-    char string[40];
-    char* inpStr = "3429";
-    loadStr(string, inpStr);
-    unsigned bufferLength = sizeof(string)/sizeof("1");
-
-
-    unsigned i=0;
-    int value = strToInt(string);
-    int divVal, mod, exp;
-    value = calcSquare(value);
-    int space = calcSpace(value);
-    while (i!=space){
-        exp = pow(10,space-i-1);
-        //printf("%d\n", exp);
-        divVal = div(value, exp);
-        value = value - divVal * exp;
-        
-        string[i] = (char) (divVal+48);
-        i++;
-    }
-    string[i] = '\0';
-    i=0;
-    while (string[i] != '\0'){
-        vmem[i*2] = string[i];// when trying this on the linux system it will segfault as programs aren't allowed to access vmem directly
-        vmem[i*2+1] = 0x07;
-        i++;
-    }
-    return 1;
+    char buff[128];
+    buff[10] = 0;
+    // print("hello world");
+    constructTable();
+    scans(buff);
+    print(buff);
+    print("->");
 }
