@@ -18,7 +18,8 @@ constructTable:
 .end:
     ret
 makeTable:
-    mov al, '0'
+    call .addManuel
+    mov al, '1'
     mov ecx, scanCodeToAsciiLookup+0x02
 .loop:
     mov [ecx],  al
@@ -27,6 +28,11 @@ makeTable:
     inc al
     inc ecx
     jmp .loop
+.addManuel:
+    ; this is needed because 0s keyboard code is greater than 9 
+    ; but its ascii value is lower
+    mov [scanCodeToAsciiLookup + 0x0B], byte '0'
+    ret
 .end:
     mov byte [tableComplete], 1
     mov byte [scanCodeToAsciiLookup+0x1C], 0
@@ -43,10 +49,11 @@ scans:
     movzx eax, al
     mov al, [scanCodeToAsciiLookup+eax]
 
+    ; cmp eax, 0x1C
+    ; je .end
     test al, al ; check if invalid char
     jz .end
-    cmp al, 0
-    je .end
+
     mov [esi], al
     inc esi
     jmp .readChar
@@ -59,7 +66,14 @@ scans:
 
 getKeyPress:
     in al, 0x64
-    test al, 1 ; if test is 0 then no charracter in buffer
-    jz getKeyPress
-    in al, 0x60 ;read scan from data port
+
+    test al, 1
+    jz getKeyPress ; if nothing in buffer do nothing
+    
+    in al, 0x60
+    cmp al, 0
+    je getKeyPress
+
+    cmp al, 0x80 ; if al > 0x80 reset as thats too high
+    jae getKeyPress
     ret

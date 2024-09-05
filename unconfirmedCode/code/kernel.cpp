@@ -57,11 +57,13 @@ void loadStr(char* string, char* num){
 }
 void print(char* string){
     char* vmem = (char*)0xb8000;
-    int i=0;
-    while (string[i] != '\0'){
-        vmem[i*2] = string[i];// when trying this on the linux system it will segfault as programs aren't allowed to access vmem directly
+    static int i=0;
+    int itter=0;
+    while (string[itter] != '\0'){
+        vmem[i*2] = string[itter];// when trying this on the linux system it will segfault as programs aren't allowed to access vmem directly
         vmem[i*2+1] = 0x07;
         i++;
+        itter++;
     }
 }
 
@@ -71,6 +73,6 @@ extern "C" int main(){
     // print("hello world");
     constructTable();
     scans(buff);
-    
     print(buff);
+    print("->");
 }
