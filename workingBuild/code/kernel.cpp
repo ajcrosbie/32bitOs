@@ -3,7 +3,10 @@
 extern "C" {
     void constructTable();        // Initializes the scan code to ASCII lookup table
     void scans(char* buffer);     // Reads input into the buffer using scan codes
+    void* mallocator(); 
 }
+
+
 
 int calcSquare(int x){
     return x*x;
@@ -60,12 +63,31 @@ void print(char* string){
     static int i=0;
     int itter=0;
     while (string[itter] != '\0'){
-        vmem[i*2] = string[itter];// when trying this on the linux system it will segfault as programs aren't allowed to access vmem directly
+        vmem[i*2] = string[itter];
+        // when trying this on the linux system it will segfault as 
+        // programs aren't allowed to access vmem directly
         vmem[i*2+1] = 0x07;
         i++;
         itter++;
     }
 }
+int toStr(char* string, int input){
+    unsigned i=0;
+    int value = strToInt(string);
+    int divVal, mod, exp;
+    value = calcSquare(value);
+    int space = calcSpace(value);
+    while (i!=space){
+        exp = pow(10,space-i-1);
+        //printf("%d\n", exp);
+        divVal = div(value, exp);
+        value = value - divVal * exp;
+        
+        string[i] = (char) (divVal+48);
+        i++;
+    }
+}
+
 
 extern "C" int main(){
     char buff[128];
@@ -74,5 +96,8 @@ extern "C" int main(){
     constructTable();
     scans(buff);
     print(buff);
-    print("->");
+    print(" squared is ");
+    int usrInt = strToInt(buff);
+    toStr(buff, usrInt);
+    print(buff);
 }
