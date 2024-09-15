@@ -1,12 +1,32 @@
 //#include<stdio.h>
-
+#define MEMORY_LENGTH 128
 extern "C" {
     void constructTable();        // Initializes the scan code to ASCII lookup table
     void scans(char* buffer);     // Reads input into the buffer using scan codes
-    void* malocator(); 
+}
+intToStr(char* buff, int a);
+void zeroinator(int *arr,int length){
+    for(int i=0;i<length;i++){
+        arr[i]=0;
+    }
 }
 
+void* mallocinator(int size){
+    int index=0;
+    int offset;
+    int static mask[MEMORY_LENGTH/sizeof(1)];
+    zeroinator(mask, MEMORY_LENGTH/sizeof(1)); // this line is wrong;
+    int static data[MEMORY_LENGTH];
+    while(index!=MEMORY_LENGTH){
+        offset=index/sizeof(1);
+        if((mask[offset]>>>index - offset*sizeof(1))&1){index++;}
+        else{
+            
+        }
+    }
+    return &data + size;
 
+}
 
 
 int numeric(char a){
@@ -66,7 +86,7 @@ void print(char* string){
     }
 }
 
-void toStr(char* string, int input){
+void intToStr(char* string, int input){
     int i=0;
     int divVal, mod, exp;
     int space = calcSpace(input);
@@ -83,13 +103,6 @@ void toStr(char* string, int input){
 
 
 extern "C" int main(){
-    char buff[128];
-    constructTable();
-    scans(buff);
-    print(buff);
-    print(" squared is ");
-    int usrInt = strToInt(buff);
-    int value = usrInt*usrInt;
-    toStr(buff,value);
-    print(buff);
+    verifyDataSetter();
+    verifyDataGetter();
 }
