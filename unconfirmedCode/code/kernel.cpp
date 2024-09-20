@@ -4,10 +4,16 @@ extern "C" {
     void constructTable();        // Initializes the scan code to ASCII lookup table
     void scans(char* buffer);     // Reads input into the buffer using scan codes
 }
-intToStr(char* buff, int a);
+
+void intToStr(char* buff, int a);
 void zeroinator(int *arr,int length){
     for(int i=0;i<length;i++){
         arr[i]=0;
+    }
+}
+void setValue(int *arr, int start, int end, int value){
+    for(int i=start;i<end;i++){
+        arr[i] = value;
     }
 }
 
@@ -17,15 +23,24 @@ void* mallocinator(int size){
     int static mask[MEMORY_LENGTH/sizeof(1)];
     zeroinator(mask, MEMORY_LENGTH/sizeof(1)); // this line is wrong;
     int static data[MEMORY_LENGTH];
-    while(index!=MEMORY_LENGTH){
-        offset=index/sizeof(1);
-        if((mask[offset]>>>index - offset*sizeof(1))&1){index++;}
+    int count =0;
+    while(index!=MEMORY_LENGTH && count !=size){
+        offset=(index+count)/sizeof(1);
+        if(mask[offset]>>((index+count) - offset*sizeof(1))&1){
+            index=index+count; 
+            count=0;
+        }
         else{
-            
+            count++;
         }
     }
-    return &data + size;
-
+    if (count == size){
+        setValue(mask, index, index+count, 1);
+        return &data + index;
+    }
+    else{
+    return 0;
+    }
 }
 
 
@@ -103,6 +118,4 @@ void intToStr(char* string, int input){
 
 
 extern "C" int main(){
-    verifyDataSetter();
-    verifyDataGetter();
 }
