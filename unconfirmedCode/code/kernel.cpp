@@ -1,28 +1,36 @@
 //#include<stdio.h>
-#define MEMORY_LENGTH 128
+#define MEMORY_LENGTH sizeof(1) * 1024
 extern "C" {
     void constructTable();        // Initializes the scan code to ASCII lookup table
     void scans(char* buffer);     // Reads input into the buffer using scan codes
 }
 
 void intToStr(char* buff, int a);
+
+
 void zeroinator(int *arr,int length){
     for(int i=0;i<length;i++){
         arr[i]=0;
     }
 }
-void setValue(int *arr, int start, int end, int value){
-    for(int i=start;i<end;i++){
-        arr[i] = value;
-    }
+
+int mask[MEMORY_LENGTH/sizeof(1)];
+int static data[MEMORY_LENGTH];
+void setBit(int *arr, int pos, int value){
+    arr[pos/sizeof(1)] |= 1<<pos%sizeof(1);
 }
 
 void* mallocinator(int size){
     int index=0;
+    static int firstRun = 0;
     int offset;
-    int static mask[MEMORY_LENGTH/sizeof(1)];
-    zeroinator(mask, MEMORY_LENGTH/sizeof(1)); // this line is wrong;
-    int static data[MEMORY_LENGTH];
+
+    if (firstRun){
+        zeroinator(mask, MEMORY_LENGTH/sizeof(1)); // this line is wrong;
+        firstRun=1;
+    }
+    
+
     int count =0;
     while(index!=MEMORY_LENGTH && count !=size){
         offset=(index+count)/sizeof(1);
@@ -35,14 +43,18 @@ void* mallocinator(int size){
         }
     }
     if (count == size){
-        setValue(mask, index, index+count, 1);
+        for (int i=index;i<=index+count;i++){
+            setBit(mask, index, 1);
+        }
         return &data + index;
     }
     else{
-    return 0;
+        return 0;
     }
 }
-
+void freeinator(void* base, int size){
+    int maskBase = base - &data;
+}
 
 int numeric(char a){
     return (a<='9'&&'0'<=a);
@@ -118,4 +130,17 @@ void intToStr(char* string, int input){
 
 
 extern "C" int main(){
+    char buff[128];
+    int* a = (int*) mallocinator(20);
+
+    for(int i=0;i<10;i++){
+        a[i] = pow(i, 2);
+        intToStr(buff, a[i]);
+        print(buff);
+        buff[0] = ' ';
+        buff[1] = 0;
+        print(buff);
+    }
+    // loadStr(buff, "hello world");
+    // print(buff);
 }
